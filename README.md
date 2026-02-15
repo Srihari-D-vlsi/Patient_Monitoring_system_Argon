@@ -1,7 +1,53 @@
-Patient Monitor Belt (Particle Argon)An intelligent patient safety system built on the Particle Argon platform. This wearable belt monitors patient vitals (temperature), detects falls in real-time, tracks orientation (standing vs. lying down), and provides indoor room-level location tracking using BLE beacons.## Key FeaturesFall Detection: Uses the MPU6050 accelerometer to detect free-fall events with a 300ms confirmation window to minimize false alarms.Department Tracking: Automatically detects "Pediatric" or "Cardiac" departments via RSSI proximity to dedicated Particle Argon beacons.Posture Monitoring: Real-time orientation tracking to determine if a patient is standing or lying down.Temperature Sensing:<6> Continuous monitoring of ambient/body temperature via the MPU6050 internal sensor.</6>Cloud Integration: Publishes JSON payloads to the Particle Cloud, including a pre-formatted Google Maps link for the facility location.Learning Mode: A "One-Touch" pairing system using the Argon's Mode button to register a patient's specific phone or smartwatch.## Hardware Configuration### ComponentsMicrocontroller: Particle Argon<7>Sensor: MPU6050 (Accelerometer + Gyroscope)</7>Indication: Onboard D7 LED (Learning Mode Indicator)Power: 5V USB (Wall/Power bank)### Wiring DiagramMPU6050 PinArgon PinNotesVCC3.3VPowerGNDGNDGroundSCLD1I2C ClockSDAD0I2C Data## Software SetupFlash Firmware: Upload the provided .ino code to your Argon via the Particle Web IDE or Workbench.Configure Beacons: Update the arg1Address and arg2Address constants in the code with the MAC addresses of your department beacons.Particle Webhook: Create a Webhook in the Particle Console to listen for the following events:status: Regular presence and health updates.falling: High-priority emergency alerts.department: Room/Area transitions.## How to Use### 1. Pairing a Device (Learning Mode)Press the MODE button on the Argon. The Blue LED (D7) will turn ON.Hold the patient's phone or BLE device near the belt.The Argon will automatically capture the MAC address, save it to EEPROM, and turn the LED OFF. The device is now tracked.### 2. Remote CommandsYou can trigger the following actions via the setStatus Particle Function:on / off: Enable or disable location reporting.fall: Manually trigger a test fall alert.info: Force an immediate status update (Temp, Orientation, etc.).## Payload StructureThe device publishes data in a compact JSON format for easy parsing by external dashboards:JSON{
-  "name": "Patient_Phone",
+# 🏥 Patient Monitor Belt (Particle Argon)
+
+An intelligent patient safety system built on the **Particle Argon** platform. This wearable belt provides real-time monitoring of patient vitals, posture, and location transitions within a facility. It is designed to minimize response times for falls and streamline patient tracking across different hospital departments using BLE (Bluetooth Low Energy).
+
+---
+
+## 🚀 Key Features
+
+* **Fall Detection:** Utilizes the MPU6050 accelerometer to detect free-fall events. A **300ms confirmation window** and G-force magnitude calculations are used to filter out false positives.
+* **Department Tracking:** Automatically detects "Pediatric" or "Cardiac" departments by measuring **RSSI proximity** to dedicated Particle Argon beacons.
+* **Posture Monitoring:** Real-time orientation tracking (Z-axis analysis) to determine if a patient is **Standing** or **Lying Down**.
+* **One-Touch Pairing (Learning Mode):** A seamless way to register a patient’s specific phone or smartwatch by simply pressing the Argon's physical `MODE` button.
+* **Cloud Integration:** Publishes rich JSON payloads to the Particle Cloud, including Google Maps links, department status, and environmental temperature.
+* **Data Persistence:** Uses **EEPROM** to store the paired device's MAC address so the belt remembers the patient even after a battery swap or reboot.
+
+---
+
+## 🛠 Hardware Configuration
+
+### Components
+* **Microcontroller:** Particle Argon (Wi-Fi + BLE)
+* **Sensor:** MPU6050 (6-Axis Accelerometer + Gyroscope)
+* **Indication:** Onboard D7 LED (Used for Learning Mode)
+* **Power:** 3.7V LiPo Battery or 5V USB Power Bank
+
+
+
+### Wiring Table
+| MPU6050 Pin | Argon Pin | Description |
+| :--- | :--- | :--- |
+| **VCC** | 3.3V | Power Supply |
+| **GND** | GND | Ground |
+| **SCL** | D1 | I2C Clock |
+| **SDA** | D0 | I2C Data |
+
+---
+
+## 💻 Software Setup
+
+1.  **Flash Firmware:** Upload the `.ino` code to your Particle Argon via the [Particle Web IDE](https://ide.particle.io) or Particle Workbench.
+2.  **Configure Beacons:** Update the `arg1Address` and `arg2Address` constants in the code with the MAC addresses of your department-specific Argon beacons.
+3.  **Webhook Integration:** Create a Webhook in the Particle Console to listen for the `status`, `falling`, and `department` events to forward data to your dashboard.
+
+### JSON Payload Structure
+```json
+{
+  "name": "Patient_iPhone",
+  "address": "AA:BB:CC:DD:EE:FF",
   "status": "here",
-  "location": "http://google.com/maps/...",
+  "location": "http://googleusercontent.com/maps.google.com/...",
   "department": "Pediatric dept",
   "orientation": "standing",
   "temperature": 32.50
